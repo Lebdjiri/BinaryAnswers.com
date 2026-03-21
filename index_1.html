@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binary Answers</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #060d14;
+    --bg-mid: #0a1628;
+    --bg-card: #0d1f35;
+    --teal: #00e5c3;
+    --teal-dim: #00b89a;
+    --teal-glow: rgba(0,229,195,0.18);
+    --teal-glow2: rgba(0,229,195,0.07);
+    --white: #e8f4f8;
+    --muted: #6a8fa8;
+    --yt: #ff0000;
+    --ig: #e1306c;
+    --fb: #1877f2;
+    --tt: #ffffff;
+    --pt: #ff424d;
+    --border: rgba(0,229,195,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-deep);
+    font-family: 'Exo 2', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === CANVAS BG === */
+  #bg-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* === MAIN LAYOUT === */
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 40px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+
+  /* === PROFILE === */
+  .profile-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .pfp-orbit {
+    position: relative;
+    width: 130px;
+    height: 130px;
+  }
+
+  .pfp-orbit .ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid var(--teal);
+    animation: orbit-spin 8s linear infinite;
+  }
+
+  .ring-1 { width: 148px; height: 148px; opacity: 0.4; animation-duration: 6s; }
+  .ring-2 { width: 164px; height: 164px; opacity: 0.2; border-style: dashed; animation-duration: 10s; animation-direction: reverse; }
+
+  .ring-dot {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: var(--teal);
+    border-radius: 50%;
+    top: -3px; left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 8px var(--teal);
+  }
+
+  @keyframes orbit-spin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to   { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  .pfp-img {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--teal);
+    box-shadow: 0 0 24px rgba(0,229,195,0.4), 0 0 60px rgba(0,229,195,0.1);
+    animation: pfp-pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes pfp-pulse {
+    0%, 100% { box-shadow: 0 0 24px rgba(0,229,195,0.4), 0 0 60px rgba(0,229,195,0.1); }
+    50%       { box-shadow: 0 0 36px rgba(0,229,195,0.65), 0 0 80px rgba(0,229,195,0.2); }
+  }
+
+  .name {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 1.7rem;
+    letter-spacing: 0.12em;
+    text-align: center;
+    color: var(--white);
+    text-shadow: 0 0 20px rgba(0,229,195,0.5);
+    animation: fadein-up 0.8s ease both;
+  }
+
+  .bio {
+    text-align: center;
+    font-size: 0.92rem;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.65;
+    max-width: 320px;
+    animation: fadein-up 0.9s 0.1s ease both;
+  }
+
+  .bio span {
+    color: var(--teal);
+    font-weight: 600;
+  }
+
+  /* === SECTION LABEL === */
+  .section-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    animation: fadein-up 1s 0.2s ease both;
+  }
+  .section-label::before,
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border));
+  }
+  .section-label::after { background: linear-gradient(to left, transparent, var(--border)); }
+
+  /* === CHANNEL LINKS === */
+  .channels {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadein-up 1s 0.3s ease both;
+  }
+
+  .channel-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 15px 20px;
+    border-radius: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--white);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), border-color 0.22s, box-shadow 0.22s, background 0.22s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .channel-btn::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 3px; height: 100%;
+    border-radius: 14px 0 0 14px;
+    background: var(--accent-color, var(--teal));
+    transition: width 0.22s;
+  }
+
+  .channel-btn:hover {
+    transform: translateY(-2px) scale(1.015);
+    border-color: var(--accent-color, var(--teal));
+    box-shadow: 0 4px 28px rgba(0,0,0,0.4), 0 0 18px var(--glow-color, var(--teal-glow));
+    background: rgba(13,31,53,0.95);
+  }
+  .channel-btn:hover::before { width: 5px; }
+  .channel-btn:active { transform: scale(0.97); }
+
+  .channel-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--icon-bg, rgba(0,229,195,0.12));
+    flex-shrink: 0;
+    transition: transform 0.22s;
+  }
+  .channel-btn:hover .channel-icon { transform: scale(1.08) rotate(-4deg); }
+
+  .channel-icon svg { width: 22px; height: 22px; }
+
+  .channel-meta { display: flex; flex-direction: column; }
+  .channel-name { font-size: 0.95rem; font-weight: 600; }
+  .channel-sub {
+    font-size: 0.72rem;
+    font-weight: 300;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .channel-arrow {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 1rem;
+    transition: transform 0.22s, color 0.22s;
+  }
+  .channel-btn:hover .channel-arrow { transform: translateX(4px); color: var(--accent-color, var(--teal)); }
+
+  /* === SUPPORT CARD === */
+  .support-card {
+    width: 100%;
+    border-radius: 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    animation: fadein-up 1s 0.5s ease both;
+  }
+
+  .support-visual {
+    width: 100%;
+    height: 140px;
+    background: linear-gradient(135deg, #0a1628 0%, #0d2240 50%, #071422 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .support-visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,229,195,0.12) 0%, transparent 70%);
+  }
+
+  .coffee-3d {
+    position: relative;
+    width: 80px; height: 80px;
+    animation: float3d 4s ease-in-out infinite;
+    filter: drop-shadow(0 8px 24px rgba(0,229,195,0.35));
+  }
+
+  @keyframes float3d {
+    0%, 100% { transform: translateY(0) rotateY(0deg); }
+    25%       { transform: translateY(-8px) rotateY(8deg); }
+    75%       { transform: translateY(-4px) rotateY(-5deg); }
+  }
+
+  .steam-line {
+    position: absolute;
+    bottom: 100%;
+    background: var(--teal);
+    border-radius: 4px;
+    opacity: 0;
+    animation: steam 2.5s ease-in-out infinite;
+  }
+  .steam-line:nth-child(1) { left: 30%; width: 2px; height: 20px; animation-delay: 0s; }
+  .steam-line:nth-child(2) { left: 50%; width: 2px; height: 14px; animation-delay: 0.5s; }
+  .steam-line:nth-child(3) { left: 68%; width: 2px; height: 18px; animation-delay: 1s; }
+
+  @keyframes steam {
+    0%   { opacity: 0; transform: translateY(0) scaleX(1); }
+    30%  { opacity: 0.6; }
+    100% { opacity: 0; transform: translateY(-30px) scaleX(1.5); }
+  }
+
+  .particle {
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: var(--teal);
+    animation: particle-float 3s ease-in-out infinite;
+  }
+
+  @keyframes particle-float {
+    0%, 100% { opacity: 0; transform: translateY(0) translateX(0); }
+    50%       { opacity: 0.5; }
+    100%      { opacity: 0; transform: translateY(-40px) translateX(10px); }
+  }
+
+  .support-body {
+    padding: 22px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .support-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--teal);
+  }
+
+  .support-desc {
+    font-size: 0.88rem;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .bnb-address {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(243,186,47,0.3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+  .bnb-address:hover { border-color: rgba(243,186,47,0.6); background: rgba(0,0,0,0.45); }
+
+  .bnb-logo {
+    width: 24px; height: 24px;
+    flex-shrink: 0;
+  }
+
+  .bnb-addr-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    color: #f3ba2f;
+    word-break: break-all;
+    flex: 1;
+  }
+
+  .copy-btn {
+    flex-shrink: 0;
+    background: rgba(243,186,47,0.15);
+    border: 1px solid rgba(243,186,47,0.3);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    color: #f3ba2f;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'Exo 2', sans-serif;
+  }
+  .copy-btn:hover { background: rgba(243,186,47,0.3); }
+  .copy-btn.copied { background: rgba(0,229,195,0.2); color: var(--teal); border-color: var(--teal); }
+
+  .network-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #f3ba2f;
+    background: rgba(243,186,47,0.08);
+    border: 1px solid rgba(243,186,47,0.2);
+    border-radius: 20px;
+    padding: 4px 10px;
+    width: fit-content;
+  }
+  .network-dot { width: 6px; height: 6px; border-radius: 50%; background: #f3ba2f; animation: blink 1.5s ease-in-out infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* === FOOTER === */
+  .footer {
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--muted);
+    opacity: 0.5;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 0.15em;
+    animation: fadein-up 1s 0.6s ease both;
+  }
+
+  /* === ANIMATIONS === */
+  @keyframes fadein-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === GLITCH === */
+  .name-glitch {
+    position: relative;
+    display: inline-block;
+  }
+  .name-glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    color: var(--teal);
+    opacity: 0;
+    animation: glitch 6s 2s infinite;
+    clip-path: polygon(0 30%, 100% 30%, 100% 55%, 0 55%);
+    transform: translateX(0);
+  }
+  @keyframes glitch {
+    0%, 90%, 100% { opacity: 0; transform: translateX(0); }
+    92%            { opacity: 0.6; transform: translateX(-3px); }
+    94%            { opacity: 0.6; transform: translateX(3px); }
+    96%            { opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="container">
+
+  <!-- PROFILE -->
+  <div class="profile-wrap">
+    <div class="pfp-orbit">
+      <div class="ring ring-1"><div class="ring-dot"></div></div>
+      <div class="ring ring-2"></div>
+      <img src="BinaryAnswers.png" alt="Binary Answers" class="pfp-img">
+    </div>
+    <h1 class="name"><span class="name-glitch" data-text="BINARY ANSWERS">BINARY ANSWERS</span></h1>
+    <p class="bio">We <span>simplify mathematics</span> by turning abstract concepts into vivid visual experiences — so numbers finally make sense.</p>
+  </div>
+
+  <!-- CHANNELS -->
+  <div class="section-label">Follow Along</div>
+
+  <div class="channels">
+
+    <!-- YouTube -->
+    <a href="https://www.youtube.com/@BinaryAnswers" target="_blank" rel="noopener" class="channel-btn" style="--accent-color:#ff0000;--glow-color:rgba(255,0,0,0.18);--icon-bg:rgba(255,0,0,0.13);">
+      <div class="channel-icon">
+        <svg viewBox="0 0 24 24" fill="#ff0000"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+      </div>
+      <div class="channel-meta">
+        <span class="channel-name">YouTube</span>
+        <span class="channel-sub">Visual math lessons</span>
+      </div>
+      <span class="channel-arrow">›</span>
+    </a>
+
+    <!-- Instagram -->
+    <a href="https://www.instagram.com/binary.answers/" target="_blank" rel="noopener" class="channel-btn" style="--accent-color:#e1306c;--glow-color:rgba(225,48,108,0.18);--icon-bg:rgba(225,48,108,0.13);">
+      <div class="channel-icon">
+        <svg viewBox="0 0 24 24" fill="url(#ig-grad)">
+          <defs>
+            <linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#f09433"/>
+              <stop offset="25%" stop-color="#e6683c"/>
+              <stop offset="50%" stop-color="#dc2743"/>
+              <stop offset="75%" stop-color="#cc2366"/>
+              <stop offset="100%" stop-color="#bc1888"/>
+            </linearGradient>
+          </defs>
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+      </div>
+      <div class="channel-meta">
+        <span class="channel-name">Instagram</span>
+        <span class="channel-sub">Reels & quick tips</span>
+      </div>
+      <span class="channel-arrow">›</span>
+    </a>
+
+    <!-- Facebook -->
+    <a href="https://www.facebook.com/profile.php?id=61588501467968" target="_blank" rel="noopener" class="channel-btn" style="--accent-color:#1877f2;--glow-color:rgba(24,119,242,0.18);--icon-bg:rgba(24,119,242,0.13);">
+      <div class="channel-icon">
+        <svg viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      </div>
+      <div class="channel-meta">
+        <span class="channel-name">Facebook</span>
+        <span class="channel-sub">Community & posts</span>
+      </div>
+      <span class="channel-arrow">›</span>
+    </a>
+
+    <!-- TikTok -->
+    <a href="https://www.tiktok.com/@binary_answers" target="_blank" rel="noopener" class="channel-btn" style="--accent-color:#69c9d0;--glow-color:rgba(105,201,208,0.18);--icon-bg:rgba(105,201,208,0.1);">
+      <div class="channel-icon">
+        <svg viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.17 8.17 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
+      </div>
+      <div class="channel-meta">
+        <span class="channel-name">TikTok</span>
+        <span class="channel-sub">Short-form explainers</span>
+      </div>
+      <span class="channel-arrow">›</span>
+    </a>
+
+    <!-- X (Twitter) -->
+    <a href="https://x.com/BinaryAnswers" target="_blank" rel="noopener" class="channel-btn" style="--accent-color:#e7e9ea;--glow-color:rgba(231,233,234,0.12);--icon-bg:rgba(231,233,234,0.08);">
+      <div class="channel-icon">
+        <svg viewBox="0 0 24 24" fill="#e7e9ea"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>
+      </div>
+      <div class="channel-meta">
+        <span class="channel-name">X (Twitter)</span>
+        <span class="channel-sub">Thoughts & updates</span>
+      </div>
+      <span class="channel-arrow">›</span>
+    </a>
+
+  </div>
+
+  <!-- SUPPORT -->
+  <div class="section-label">Support</div>
+
+  <div class="support-card">
+    <div class="support-visual">
+      <div class="coffee-3d">
+        <!-- Animated SVG Coffee Cup -->
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="cup-grad" x1="0" y1="0" x2="80" y2="80" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#1a3a5c"/>
+              <stop offset="100%" stop-color="#0d2240"/>
+            </linearGradient>
+            <linearGradient id="liquid-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#00e5c3" stop-opacity="0.9"/>
+              <stop offset="100%" stop-color="#00b89a" stop-opacity="0.7"/>
+            </linearGradient>
+            <filter id="glow-cup">
+              <feGaussianBlur stdDeviation="2" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- Saucer -->
+          <ellipse cx="40" cy="68" rx="28" ry="5" fill="#0a1a2e" opacity="0.8"/>
+          <!-- Cup body -->
+          <path d="M18 35 L22 65 Q40 70 58 65 L62 35 Z" fill="url(#cup-grad)" stroke="#00e5c3" stroke-width="1.5" stroke-opacity="0.5"/>
+          <!-- Liquid surface -->
+          <ellipse cx="40" cy="36" rx="21" ry="5" fill="url(#liquid-grad)" opacity="0.85" filter="url(#glow-cup)"/>
+          <!-- Cup rim -->
+          <ellipse cx="40" cy="35" rx="22" ry="5.5" fill="none" stroke="#00e5c3" stroke-width="1.5" stroke-opacity="0.7"/>
+          <!-- Handle -->
+          <path d="M60 42 Q72 42 72 52 Q72 62 60 62" fill="none" stroke="#00e5c3" stroke-width="2" stroke-opacity="0.6" stroke-linecap="round"/>
+          <!-- Circuit lines on cup -->
+          <line x1="28" y1="45" x2="36" y2="45" stroke="#00e5c3" stroke-width="0.8" stroke-opacity="0.4"/>
+          <line x1="36" y1="45" x2="36" y2="52" stroke="#00e5c3" stroke-width="0.8" stroke-opacity="0.4"/>
+          <circle cx="36" cy="52" r="1.5" fill="#00e5c3" fill-opacity="0.5"/>
+          <line x1="44" y1="48" x2="52" y2="48" stroke="#00e5c3" stroke-width="0.8" stroke-opacity="0.4"/>
+          <circle cx="44" cy="48" r="1.5" fill="#00e5c3" fill-opacity="0.5"/>
+          <!-- Steam -->
+          <path class="steam-line" d="M32 30 Q30 22 32 14" stroke="#00e5c3" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0" style="animation:steam-path 2.5s ease-in-out infinite"/>
+          <path d="M40 30 Q38 20 40 12" stroke="#00e5c3" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0" style="animation:steam-path 2.5s 0.6s ease-in-out infinite"/>
+          <path d="M48 30 Q50 22 48 14" stroke="#00e5c3" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0" style="animation:steam-path 2.5s 1.2s ease-in-out infinite"/>
+        </svg>
+        <style>
+          @keyframes steam-path {
+            0%   { opacity: 0; transform: translateY(0); }
+            30%  { opacity: 0.7; }
+            100% { opacity: 0; transform: translateY(-12px); }
+          }
+        </style>
+      </div>
+      <!-- Floating particles -->
+      <div class="particle" style="left:20%;top:60%;animation-delay:0s;"></div>
+      <div class="particle" style="left:75%;top:70%;animation-delay:1s;"></div>
+      <div class="particle" style="left:50%;top:80%;animation-delay:0.5s;"></div>
+      <div class="particle" style="left:35%;top:50%;animation-delay:1.5s;"></div>
+    </div>
+
+    <div class="support-body">
+      <div class="support-title">☕ Fuel the next visualization</div>
+      <p class="support-desc">Buy a cup of coffee for the next math visualization. Every contribution helps create better, deeper content.</p>
+
+      <div class="network-badge">
+        <div class="network-dot"></div>
+        BNB Smart Chain · BEP20
+      </div>
+
+      <div class="bnb-address" onclick="copyAddress(this)">
+        <!-- BNB Logo -->
+        <svg class="bnb-logo" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="16" fill="#F3BA2F"/>
+          <path d="M12.116 14.404L16 10.52l3.886 3.886 2.26-2.26L16 6l-6.144 6.144 2.26 2.26zM6 16l2.26-2.26L10.52 16l-2.26 2.26L6 16zm6.116 1.596L16 21.48l3.886-3.886 2.26 2.259L16 26l-6.146-6.146-.001-.001 2.263-2.257zM21.48 16l2.26-2.26L26 16l-2.26 2.26L21.48 16zm-3.188-.002h.002L16 13.706l-1.73 1.732-.199.199-.43.43.001.001-.001.001 2.358 2.359 2.294-2.293.001-.001-.013-.136z" fill="#131313"/>
+        </svg>
+        <span class="bnb-addr-text" id="bnb-addr">0xf03a3f6fcd6263adab6a3cf75ff2d4d738ea61c3</span>
+        <button class="copy-btn" id="copy-btn">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">© 2025 Binary Answers · Math Visualized</div>
+
+</div>
+
+<script>
+// ======= COPY ADDRESS =======
+function copyAddress(el) {
+  const addr = document.getElementById('bnb-addr').textContent;
+  const btn = document.getElementById('copy-btn');
+  navigator.clipboard.writeText(addr).then(() => {
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ======= PARTICLE CANVAS =======
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const PARTICLE_COUNT = 60;
+const particles = [];
+
+for (let i = 0; i < PARTICLE_COUNT; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    r: Math.random() * 1.5 + 0.3,
+    alpha: Math.random() * 0.4 + 0.1,
+    type: Math.random() > 0.6 ? 'bit' : 'dot',
+    bit: Math.random() > 0.5 ? '0' : '1',
+    fontSize: Math.random() * 8 + 8,
+    pulse: Math.random() * Math.PI * 2
+  });
+}
+
+// Connection lines
+function dist(a, b) {
+  return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+}
+
+function drawFrame(t) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw connections
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const d = dist(particles[i], particles[j]);
+      if (d < 120) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(0,229,195,${0.04 * (1 - d / 120)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Draw particles
+  particles.forEach(p => {
+    p.pulse += 0.015;
+    const alphaMod = p.alpha + Math.sin(p.pulse) * 0.1;
+
+    if (p.type === 'bit') {
+      ctx.font = `${p.fontSize}px 'Orbitron', monospace`;
+      ctx.fillStyle = `rgba(0,229,195,${alphaMod * 0.5})`;
+      ctx.fillText(p.bit, p.x, p.y);
+    } else {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0,229,195,${alphaMod})`;
+      ctx.fill();
+    }
+
+    p.x += p.vx;
+    p.y += p.vy;
+
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+  });
+
+  requestAnimationFrame(drawFrame);
+}
+
+requestAnimationFrame(drawFrame);
+</script>
+</body>
+</html>
